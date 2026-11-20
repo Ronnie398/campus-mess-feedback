@@ -96,7 +96,15 @@
             });
 
             const data = await response.json();
-            document.getElementById("status").textContent = data.message || data.error;
+
+            if (data.message) {
+                document.getElementById("status").textContent = data.message;
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1500);
+            } else {
+                document.getElementById("status").textContent = data.error;
+            }
         }
     </script>
 </body>
