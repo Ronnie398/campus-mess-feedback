@@ -103,18 +103,18 @@
 <body>
     <header>
         <h1>Campus Mess Feedback System</h1>
-        <p>View today’s menu and share your feedback</p>
+        <p>View the mess menu and share your feedback</p>
     </header>
 
     <main>
         <div class="card">
             <h2>Mess Menu</h2>
-        
+
             <label for="menuDate">Select date</label>
             <input type="date" id="menuDate">
-        
+
             <button onclick="loadMenu()">Show Menu</button>
-        
+
             <div id="menu" style="margin-top: 15px;">
                 <p>Loading menu...</p>
             </div>
@@ -122,6 +122,7 @@
 
         <div class="card">
             <h2>Give Feedback</h2>
+
             <label for="meal">Meal</label>
             <select id="meal">
                 <option value="Breakfast">Breakfast</option>
@@ -165,18 +166,18 @@
         const today = new Date().toISOString().slice(0, 10);
 
         async function loadMenu() {
-                const selectedDate = document.getElementById("menuDate").value || today;
+            const selectedDate = document.getElementById("menuDate").value || today;
 
-                const response = await fetch(`${API_URL}/menu?date=${selectedDate}`);
-                const data = await response.json();
+            const response = await fetch(`${API_URL}/menu?date=${selectedDate}`);
+            const data = await response.json();
 
-                document.getElementById("menu").innerHTML = `
-    <div class="menu-item"><b>Date:</b> ${data.date}</div>
-    <div class="menu-item"><b>Breakfast:</b> ${data.breakfast}</div>
-    <div class="menu-item"><b>Lunch:</b> ${data.lunch}</div>
-    <div class="menu-item"><b>Dinner:</b> ${data.dinner}</div>
-  `;
-            }
+            document.getElementById("menu").innerHTML = `
+        <div class="menu-item"><b>Date:</b> ${data.date}</div>
+        <div class="menu-item"><b>Breakfast:</b> ${data.breakfast}</div>
+        <div class="menu-item"><b>Lunch:</b> ${data.lunch}</div>
+        <div class="menu-item"><b>Dinner:</b> ${data.dinner}</div>
+      `;
+        }
 
         async function submitFeedback() {
             const meal = document.getElementById("meal").value;
@@ -224,8 +225,8 @@
         }
 
         document.getElementById("menuDate").value = today;
-            loadMenu();
-            loadFeedback();
+        loadMenu();
+        loadFeedback();
     </script>
 </body>
 
