@@ -108,8 +108,14 @@
 
     <main>
         <div class="card">
-            <h2>Today’s Menu</h2>
-            <div id="menu">
+            <h2>Mess Menu</h2>
+        
+            <label for="menuDate">Select date</label>
+            <input type="date" id="menuDate">
+        
+            <button onclick="loadMenu()">Show Menu</button>
+        
+            <div id="menu" style="margin-top: 15px;">
                 <p>Loading menu...</p>
             </div>
         </div>
@@ -159,15 +165,18 @@
         const today = new Date().toISOString().slice(0, 10);
 
         async function loadMenu() {
-            const response = await fetch(`${API_URL}/menu?date=${today}`);
-            const data = await response.json();
+                const selectedDate = document.getElementById("menuDate").value || today;
 
-            document.getElementById("menu").innerHTML = `
-        <div class="menu-item"><b>Breakfast:</b> ${data.breakfast}</div>
-        <div class="menu-item"><b>Lunch:</b> ${data.lunch}</div>
-        <div class="menu-item"><b>Dinner:</b> ${data.dinner}</div>
-      `;
-        }
+                const response = await fetch(`${API_URL}/menu?date=${selectedDate}`);
+                const data = await response.json();
+
+                document.getElementById("menu").innerHTML = `
+    <div class="menu-item"><b>Date:</b> ${data.date}</div>
+    <div class="menu-item"><b>Breakfast:</b> ${data.breakfast}</div>
+    <div class="menu-item"><b>Lunch:</b> ${data.lunch}</div>
+    <div class="menu-item"><b>Dinner:</b> ${data.dinner}</div>
+  `;
+            }
 
         async function submitFeedback() {
             const meal = document.getElementById("meal").value;
@@ -214,8 +223,9 @@
             document.getElementById("summary").innerHTML = feedbackHTML;
         }
 
-        loadMenu();
-        loadFeedback();
+        document.getElementById("menuDate").value = today;
+            loadMenu();
+            loadFeedback();
     </script>
 </body>
 
