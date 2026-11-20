@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mess Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+        }
+
+        header {
+            background: #1467b3;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 700px;
+            margin: 25px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            margin-top: 15px;
+            background: #1467b3;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Mess Committee Admin</h1>
+    </header>
+    <main>
+        <h2>Update Today’s Menu</h2>
+
+        <label>Date</label>
+        <input id="date" type="date">
+
+        <label>Breakfast</label>
+        <input id="breakfast" placeholder="Enter breakfast menu">
+
+        <label>Lunch</label>
+        <input id="lunch" placeholder="Enter lunch menu">
+
+        <label>Dinner</label>
+        <input id="dinner" placeholder="Enter dinner menu">
+
+        <button onclick="saveMenu()">Save Menu</button>
+        <p id="status"></p>
+    </main>
+
+    <script>
+        const API_URL = "https://hfvhszwzr3.execute-api.ap-southeast-2.amazonaws.com";
+
+        async function saveMenu() {
+            const response = await fetch(`${API_URL}/menu`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    date: document.getElementById("date").value,
+                    breakfast: document.getElementById("breakfast").value,
+                    lunch: document.getElementById("lunch").value,
+                    dinner: document.getElementById("dinner").value
+                })
+            });
+
+            const data = await response.json();
+            document.getElementById("status").textContent = data.message || data.error;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Mess Feedback</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #1467b3;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1467b3;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            background: #1467b3;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0e4f8a;
+        }
+
+        .menu-item {
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            color: #f5a623;
+            font-size: 20px;
+        }
+
+        .feedback-item {
+            border-top: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Campus Mess Feedback System</h1>
+        <p>View today’s menu and share your feedback</p>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Today’s Menu</h2>
+            <div id="menu">
+                <p>Loading menu...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Give Feedback</h2>
+            <label for="meal">Meal</label>
+            <select id="meal">
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+            </select>
+
+            <label for="rating">Rating</label>
+            <select id="rating">
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Average</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Very Poor</option>
+            </select>
+
+            <label for="comment">Comment</label>
+            <textarea id="comment" rows="3" placeholder="Write your feedback..."></textarea>
+
+            <label for="studentName">Your name (optional)</label>
+            <input id="studentName" placeholder="Anonymous">
+
+            <button onclick="submitFeedback()">Submit Feedback</button>
+            <p id="status" class="status"></p>
+        </div>
+
+        <div class="card">
+            <h2>Feedback Summary</h2>
+            <div id="summary">
+                <p>Loading feedback...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Built using AWS Amplify, API Gateway, AWS Lambda, and Amazon DynamoDB
+    </footer>
+
+    <script>
+        const API_URL = "https://hfvhszwzr3.execute-api.ap-southeast-2.amazonaws.com";
+        const today = new Date().toISOString().slice(0, 10);
+
+        async function loadMenu() {
+            const response = await fetch(`${API_URL}/menu?date=${today}`);
+            const data = await response.json();
+
+            document.getElementById("menu").innerHTML = `
+        <div class="menu-item"><b>Breakfast:</b> ${data.breakfast}</div>
+        <div class="menu-item"><b>Lunch:</b> ${data.lunch}</div>
+        <div class="menu-item"><b>Dinner:</b> ${data.dinner}</div>
+      `;
+        }
+
+        async function submitFeedback() {
+            const meal = document.getElementById("meal").value;
+            const rating = document.getElementById("rating").value;
+            const comment = document.getElementById("comment").value;
+            const studentName = document.getElementById("studentName").value || "Anonymous";
+
+            const response = await fetch(`${API_URL}/feedback`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    date: today,
+                    meal,
+                    rating,
+                    comment,
+                    studentName
+                })
+            });
+
+            const data = await response.json();
+            document.getElementById("status").textContent = data.message || data.error;
+            loadFeedback();
+        }
+
+        async function loadFeedback() {
+            const response = await fetch(`${API_URL}/feedback?date=${today}`);
+            const data = await response.json();
+
+            let feedbackHTML = `
+        <p><b>Total feedback:</b> ${data.totalFeedback}</p>
+        <p><b>Average rating:</b> <span class="rating">${data.averageRating} / 5</span></p>
+      `;
+
+            data.feedback.forEach(item => {
+                feedbackHTML += `
+          <div class="feedback-item">
+            <b>${item.meal}</b> — ${item.rating}/5<br>
+            ${item.comment || "No comment"}<br>
+            <small>By ${item.studentName}</small>
+          </div>
+        `;
+            });
+
+            document.getElementById("summary").innerHTML = feedbackHTML;
+        }
+
+        loadMenu();
+        loadFeedback();
+    </script>
+</body>
+
+</html>
